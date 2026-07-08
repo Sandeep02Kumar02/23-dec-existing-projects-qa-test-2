@@ -4,7 +4,7 @@ A minimal, single-file **Node.js HTTP server** built entirely on the Node.js
 built-in [`http`](https://nodejs.org/api/http.html) module, with **zero
 third-party dependencies**. Every request — regardless of HTTP method or URL
 path — receives the same fixed plain-text response: `Hello, World!`.
-_Source: server.js:L1-L15._
+_Source: server.js:L1-L77._
 
 > **A note on naming.** This repository is titled **`hao-backprop-test`**, while
 > the npm package declared in `package.json` is named **`hello_world`**. The two
@@ -17,7 +17,7 @@ _Source: server.js:L1-L15._
 on port `3000` and answers **every** request with an identical response. There
 is no routing, no middleware, no environment-variable configuration, and no
 persistence layer — the entire application is the one file `server.js`.
-_Source: server.js:L1-L15._
+_Source: server.js:L1-L77._
 
 The **response contract is identical for all requests**:
 
@@ -25,7 +25,7 @@ The **response contract is identical for all requests**:
 - **Header:**  `Content-Type: text/plain`
 - **Body:**    `Hello, World!\n`
 
-_Source: server.js:L6-L10._
+_Source: server.js:L63-L65._
 
 ## Table of Contents
 
@@ -44,7 +44,7 @@ _Source: server.js:L6-L10._
 - **Node.js** — **24 LTS is recommended**; **22.x is also supported**. Any
   maintained Node.js LTS release works, because `server.js` relies only on the
   long-stable core `http` API. (Note: Node.js 20 reached end-of-life on
-  2026-04-30.) `npm` ships bundled with Node.js. _Source: server.js:L1._
+  2026-04-30.) `npm` ships bundled with Node.js. _Source: Node.js release schedule (https://nodejs.org/en/about/previous-releases); server.js:L27._
 - **Git** — optional, needed only to clone the repository.
 - **No other dependencies** — the project declares zero third-party packages.
   _Source: package-lock.json:L6-L12._
@@ -79,7 +79,7 @@ running in the foreground:
 Server running at http://127.0.0.1:3000/
 ```
 
-_Source: server.js:L12-L14._
+_Source: server.js:L75._
 
 In another terminal, send a request to confirm it is serving:
 
@@ -99,7 +99,7 @@ Stop the server with **`Ctrl+C`** in the terminal where it is running.
 
 The server exposes exactly **one de-facto endpoint**. There is no routing or
 method dispatch: **any HTTP method** sent to **any path** yields the same
-response. _Source: server.js:L6-L10._
+response. _Source: server.js:L52-L66._
 
 The **response contract is identical for all requests**:
 
@@ -107,7 +107,7 @@ The **response contract is identical for all requests**:
 - **Header:**  `Content-Type: text/plain`
 - **Body:**    `Hello, World!\n`
 
-_Source: server.js:L6-L10._
+_Source: server.js:L63-L65._
 
 | Property        | Value                              |
 |-----------------|------------------------------------|
@@ -117,7 +117,7 @@ _Source: server.js:L6-L10._
 | `Content-Type`  | `text/plain`                       |
 | Response body   | `Hello, World!\n`                  |
 
-_Source: server.js:L6-L10._
+_Source: server.js:L52-L66._
 
 ### Example request and response
 
@@ -138,7 +138,7 @@ Hello, World!
 ```
 
 The `Content-Length` is `14` bytes — the 13 characters of `Hello, World!`
-plus the trailing newline (`\n`). _Source: server.js:L9._
+plus the trailing newline (`\n`). _Source: server.js:L65._
 
 ### Request/response flow
 
@@ -154,7 +154,7 @@ sequenceDiagram
 ## Code Explanation
 
 The entire application lives in `server.js`. Below is an annotated walkthrough
-of the four logical steps. _Source: server.js:L1-L15._
+of the four logical steps. _Source: server.js:L1-L77._
 
 **1. Import the `http` module**
 
@@ -163,7 +163,7 @@ const http = require('http');
 ```
 
 Loads Node.js's built-in HTTP server library. No third-party package is
-involved. _Source: server.js:L1._
+involved. _Source: server.js:L27._
 
 **2. Configuration constants**
 
@@ -174,7 +174,7 @@ const port = 3000;
 
 The host and port are hard-coded to the loopback interface `127.0.0.1` and
 port `3000`. No environment variables are consulted, so changing these values
-requires editing the source file. _Source: server.js:L3-L4._
+requires editing the source file. _Source: server.js:L36-L44._
 
 **3. Create the server and request handler**
 
@@ -190,7 +190,7 @@ const server = http.createServer((req, res) => {
 inbound request. The handler sets `statusCode = 200`, sets the
 `Content-Type: text/plain` header, and ends the response with the body
 `Hello, World!\n`. The `req` object is never inspected — method, path, headers,
-and body are all ignored. _Source: server.js:L6-L10._
+and body are all ignored. _Source: server.js:L52-L66._
 
 **4. Start listening**
 
@@ -202,7 +202,7 @@ server.listen(port, hostname, () => {
 
 `server.listen` binds to `127.0.0.1:3000` and begins accepting connections.
 Once listening, the startup callback logs
-`Server running at http://127.0.0.1:3000/`. _Source: server.js:L12-L14._
+`Server running at http://127.0.0.1:3000/`. _Source: server.js:L69-L77._
 
 ### Startup and request-handling flow
 
@@ -223,7 +223,7 @@ flowchart TD
 > machine**. It is **not** accessible from other hosts, nor from outside a
 > container. Making it externally reachable would require either changing the
 > bind address in `server.js` (out of scope for this documentation) or placing a
-> **same-host reverse proxy** in front of it. _Source: server.js:L3._
+> **same-host reverse proxy** in front of it. _Source: server.js:L36._
 
 ### Local
 
@@ -262,7 +262,7 @@ CMD ["node", "server.js"]
 > container, publishing a port (e.g. `-p 3000:3000`) will **not** make it
 > reachable from the host without first changing the bind address to `0.0.0.0`
 > in the source. This is a documented limitation, not a change to make here.
-> _Source: server.js:L3._
+> _Source: server.js:L36._
 
 ### Reverse proxy (nginx, same host)
 
@@ -281,7 +281,7 @@ server {
 ```
 
 This works because nginx runs on the same host as the server and can therefore
-reach the loopback address `127.0.0.1:3000`. _Source: server.js:L3._
+reach the loopback address `127.0.0.1:3000`. _Source: server.js:L36._
 
 ## Project Notes
 
@@ -298,7 +298,7 @@ documentation:
   `npm start`. _Source: package.json:L6-L8._
 - **Host and port are hard-coded.** The server always binds to
   `127.0.0.1:3000`; no environment variables are read, so changing the host or
-  port requires editing `server.js`. _Source: server.js:L3-L4._
+  port requires editing `server.js`. _Source: server.js:L36-L44._
 - **Repository title vs. package name.** The repository title
   (`hao-backprop-test`) differs from the npm package name (`hello_world`).
   _Source: README.md:L1, package.json:L2._
