@@ -1,6 +1,6 @@
 /**
  * @fileoverview Minimal single-file Node.js HTTP server. It listens on the
- * loopback interface 127.0.0.1 at port 3000 and responds to EVERY request —
+ * loopback interface `127.0.0.1` at port `3000` and responds to EVERY request —
  * regardless of HTTP method or URL path — with an identical plain-text
  * "Hello, World!" message. The server has no routing, middleware, environment
  * configuration, or third-party dependencies; it uses only the Node.js
@@ -27,17 +27,17 @@
 const http = require('http');
 
 /**
- * Loopback host interface the server binds to. Because it is 127.0.0.1, the
- * server is reachable only from the local machine. Changing it requires editing
- * this file (no environment variable is consulted).
+ * The server binds to the loopback interface `127.0.0.1`. Because it is a
+ * loopback address, the server is reachable only from the local machine.
+ * Changing it requires editing this file (no environment variable is consulted).
  * @constant
  * @type {string}
  */
 const hostname = '127.0.0.1';
 
 /**
- * TCP port the server listens on. Hard-coded; changing it requires editing this
- * file (no environment variable is consulted).
+ * The server listens on port `3000`. Hard-coded; changing it requires editing
+ * this file (no environment variable is consulted).
  * @constant
  * @type {number}
  */
@@ -66,10 +66,12 @@ const server = http.createServer(
   }
 );
 
-/**
- * Startup callback invoked once the server is listening; logs the server URL.
- * @returns {void}
- */
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+server.listen(port, hostname,
+  /**
+   * Startup callback invoked once the server is listening; logs the server URL.
+   * @returns {void}
+   */
+  () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
+  }
+);
