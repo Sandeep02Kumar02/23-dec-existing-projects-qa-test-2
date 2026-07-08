@@ -98,8 +98,12 @@ Stop the server with **`Ctrl+C`** in the terminal where it is running.
 ## API Documentation
 
 The server exposes exactly **one de-facto endpoint**. There is no routing or
-method dispatch: **any HTTP method** sent to **any path** yields the same
-response. _Source: server.js:L52-L66._
+method dispatch: **any standard (parser-accepted) HTTP method** sent to **any
+path** yields the same response, because the request handler never inspects the
+request. Node.js's built-in HTTP parser accepts the standard method tokens
+(`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `OPTIONS`, `HEAD`, `TRACE`, and other
+registered methods) and rejects unknown/non-standard method tokens with a
+`400 Bad Request` before the handler runs. _Source: server.js:L52-L66._
 
 The **response contract is identical for all requests**:
 
@@ -111,7 +115,7 @@ _Source: server.js:L63-L65._
 
 | Property        | Value                              |
 |-----------------|------------------------------------|
-| Methods         | Any (GET, POST, PUT, DELETE, …)    |
+| Methods         | Any standard/parser-accepted method (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `OPTIONS`, `HEAD`, …) |
 | Path            | Any (`/`, `/anything`, …)          |
 | Status          | `200 OK`                           |
 | `Content-Type`  | `text/plain`                       |
@@ -146,6 +150,13 @@ Node.js's built-in HTTP layer — `server.js` itself sets only `Content-Type`
 (via `res.setHeader`). Their exact values (the `Date` timestamp and the
 `Keep-Alive: timeout=5` keep-alive window) are transport details that can vary
 by Node.js version. _Source: server.js:L63-L65 (only `Content-Type` is set)._
+
+> **`HEAD` is a header-only exception.** Per the HTTP specification, a response
+> to a `HEAD` request carries headers but no body. Because `server.js` writes
+> the body with `res.end('Hello, World!\n')` and never sets `Content-Length`
+> explicitly, a `HEAD` request returns `200 OK` with `Content-Type: text/plain`
+> but **without** a `Content-Length` header, whereas body-bearing methods
+> (`GET`, `POST`, …) include `Content-Length: 14`. _Source: server.js:L62-L66._
 
 ### Request/response flow
 
@@ -301,14 +312,17 @@ documentation:
   runnable entry point is `server.js`. _Source: package.json:L5._
 - **No `start` script.** The only npm script is a placeholder `test` that exits
   with an error (`echo "Error: no test specified" && exit 1`); there is **no**
-  `start` script. Run the server with `node server.js` directly — never
-  `npm start`. _Source: package.json:L6-L8._
+  `start` script defined. Run the server with `node server.js` directly rather
+  than an npm lifecycle start command (there is none to invoke).
+  _Source: package.json:L6-L8._
 - **Host and port are hard-coded.** The server always binds to
   `127.0.0.1:3000`; no environment variables are read, so changing the host or
   port requires editing `server.js`. _Source: server.js:L36-L44._
 - **Repository title vs. package name.** The repository title
   (`hao-backprop-test`) differs from the npm package name (`hello_world`).
   _Source: README.md:L1, package.json:L2._
+- **Package version.** The npm package `hello_world` is at version `1.0.0`.
+  _Source: package.json:L3._
 
 ## License
 
