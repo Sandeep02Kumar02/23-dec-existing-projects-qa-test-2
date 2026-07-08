@@ -132,6 +132,7 @@ HTTP/1.1 200 OK
 Content-Type: text/plain
 Date: <date>
 Connection: keep-alive
+Keep-Alive: timeout=5
 Content-Length: 14
 
 Hello, World!
@@ -139,6 +140,12 @@ Hello, World!
 
 The `Content-Length` is `14` bytes — the 13 characters of `Hello, World!`
 plus the trailing newline (`\n`). _Source: server.js:L65._
+
+The `Date`, `Connection`, and `Keep-Alive` headers are added automatically by
+Node.js's built-in HTTP layer — `server.js` itself sets only `Content-Type`
+(via `res.setHeader`). Their exact values (the `Date` timestamp and the
+`Keep-Alive: timeout=5` keep-alive window) are transport details that can vary
+by Node.js version. _Source: server.js:L63-L65 (only `Content-Type` is set)._
 
 ### Request/response flow
 
