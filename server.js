@@ -1,30 +1,39 @@
 /**
- * @fileoverview Minimal single-file Node.js HTTP server. It listens on the
- * loopback interface `127.0.0.1` at port `3000` and responds to EVERY request —
- * regardless of HTTP method or URL path — with an identical plain-text
- * "Hello, World!" message. The server has no routing, middleware, environment
- * configuration, or third-party dependencies; it uses only the Node.js
- * built-in `http` module.
+ * @fileoverview Minimal Express.js tutorial HTTP server. It listens on the
+ * loopback interface `127.0.0.1` at port `3000` and exposes two GET endpoints
+ * built with the Express web framework:
  *
- * Response contract (identical for all requests):
- *   - Status:  200 OK
- *   - Header:  Content-Type: text/plain
- *   - Body:    "Hello, World!\n"
+ *   - GET /               -> 200, text/plain, body "Hello, World!\n"
+ *   - GET /good-morning   -> 200, text/plain, body "Good morning\n"
+ *
+ * Express is the project's single third-party dependency; it wraps the Node.js
+ * built-in `http` module and provides the routing used above. Requests to any
+ * other path (or with a method that is not registered for a path) fall through
+ * to Express's built-in 404 handler.
  *
  * On successful startup the process logs:
  *   "Server running at http://127.0.0.1:3000/"
  *
- * Start the server with: node server.js
+ * Start the server with: `node server.js` (or `npm start`).
  *
  * @module server
  */
 
 /**
- * Node.js built-in HTTP module, used to create the server instance.
+ * The Express framework factory. Calling it returns a new application instance.
+ * Provided by the `express` third-party dependency declared in package.json.
  * @constant
- * @type {typeof import('http')}
+ * @type {typeof import('express')}
  */
-const http = require('http');
+const express = require('express');
+
+/**
+ * The Express application instance. HTTP routes are registered on this object,
+ * and it is ultimately bound to a network interface via `app.listen`.
+ * @constant
+ * @type {import('express').Express}
+ */
+const app = express();
 
 /**
  * The server binds to the loopback interface `127.0.0.1`. Because it is a
@@ -44,34 +53,39 @@ const hostname = '127.0.0.1';
 const port = 3000;
 
 /**
- * The HTTP server instance. Every request is served by the handler passed to
- * http.createServer below.
- * @constant
- * @type {http.Server}
+ * Root endpoint handler. Responds to `GET /` with the original tutorial
+ * greeting, preserving the response contract of the pre-Express implementation
+ * (status 200, Content-Type text/plain, body "Hello, World!\n").
+ *
+ * @param {import('express').Request} req - Inbound request object (not inspected).
+ * @param {import('express').Response} res - Outbound response; set to status 200
+ *   with a `text/plain` Content-Type and ended with the body "Hello, World!\n".
+ * @returns {void}
  */
-const server = http.createServer(
-  /**
-   * HTTP request handler. Sends the same response to every request,
-   * irrespective of method, path, headers, or body.
-   *
-   * @param {http.IncomingMessage} req - Inbound request object (not inspected).
-   * @param {http.ServerResponse} res - Outbound response; set to status 200 with
-   *   a text/plain Content-Type and ended with the body "Hello, World!\n".
-   * @returns {void}
-   */
-  (req, res) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello, World!\n');
-  }
-);
+app.get('/', (req, res) => {
+  res.status(200).type('text/plain').send('Hello, World!\n');
+});
 
-server.listen(port, hostname,
-  /**
-   * Startup callback invoked once the server is listening; logs the server URL.
-   * @returns {void}
-   */
-  () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
-  }
-);
+/**
+ * "Good morning" endpoint handler. Responds to `GET /good-morning` with a
+ * plain-text morning greeting.
+ *
+ * @param {import('express').Request} req - Inbound request object (not inspected).
+ * @param {import('express').Response} res - Outbound response; set to status 200
+ *   with a `text/plain` Content-Type and ended with the body "Good morning\n".
+ * @returns {void}
+ */
+app.get('/good-morning', (req, res) => {
+  res.status(200).type('text/plain').send('Good morning\n');
+});
+
+/**
+ * Bind the Express application to `127.0.0.1:3000` and begin accepting
+ * connections. The startup callback runs once the server is listening and logs
+ * the server URL.
+ *
+ * @returns {void}
+ */
+app.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});

@@ -1,0 +1,19 @@
+# Node.js dependencies (restored via `npm install`)
+node_modules/
+
+# npm/yarn debug and error logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime/diagnostic output
+*.log
+
+# Environment variable files (should not be committed)
+.env
+.env.local
+.env.*.local
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
